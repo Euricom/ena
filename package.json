@@ -1,0 +1,24 @@
+{
+ "name": "ena",
+ "version": "0.0.1",
+ "description": "Euricom Expense Note App",
+ "main": "index.js",
+ "scripts": {
+  "prestart": "lerna bootstrap",
+  "start": "lerna run start",
+  "test": "echo \"Error: no test specified\" && exit 1"
+ },
+ "repository": {
+  "type": "git",
+  "url": "git+https://github.com/Euricom/ena.git"
+ },
+ "author": "",
+ "license": "ISC",
+ "bugs": {
+  "url": "https://github.com/Euricom/ena/issues"
+ },
+ "homepage": "https://github.com/Euricom/ena#readme",
+ "devDependencies": {
+  "lerna": "^3.22.1"
+ }
+}
