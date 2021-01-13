@@ -1,0 +1,71 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type StatusType {
+  id: ID!
+  statusTypeId: ID!
+  name: String!
+}
+
+type Role {
+  id: ID!
+  roleId: ID!
+  name: String!
+}
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  bankAccountNumber: String!
+  costCenter: Int!
+  vendorAccount: Int!
+  active: Boolean!
+  expenses: [Expense!]!
+  roles: [Role!]!
+}
+
+type Status {
+  id: ID!
+  date: DateTime!
+  reason: String
+  type: StatusType!
+  user: User!
+  statusType: StatusType!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Category {
+  id: ID!
+  icon: String
+  name: String!
+  generalLedgerAccount: Int!
+  active: Boolean!
+}
+
+type Expense {
+  id: ID!
+  date: DateTime!
+  amount: Float!
+  reason: String
+  statuses: [Status!]!
+  category: Category!
+  status: Status!
+}
+
+type Query {
+  users: [User]!
+  user(id: Int!): User!
+  categories: [Category]!
+  category(id: Int!): Category!
+  expenses: [Expense]!
+  expense(id: Int!): Expense!
+  statuses: [Status]!
+  status(id: Int!): Status!
+}
