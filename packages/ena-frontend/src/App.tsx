@@ -7,17 +7,26 @@ import './App.css';
 
 function App() {
     return (
-        <Router>
-            <Switch>
-                <Route path="/expenses">
-                    <Expenses />
-                </Route>
+        <>
+            <header className="app-header">
+                <span className="app-header__title">ENA</span>
+                <span className="app-header__avatar"></span>
+            </header>
 
-                <Route path="*">
-                    <Redirect to="expenses" />
-                </Route>
-            </Switch>
-        </Router>
+            <div className="app-content">
+                <Router>
+                    <Switch>
+                        <Route path="/expenses">
+                            <Expenses />
+                        </Route>
+
+                        <Route path="*">
+                            <Redirect to="expenses" />
+                        </Route>
+                    </Switch>
+                </Router>
+            </div>
+        </>
     );
 }
 

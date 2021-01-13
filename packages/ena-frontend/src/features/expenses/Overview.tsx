@@ -1,6 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
+import Button from '../../components/button/Button';
+
+import './Overview.css';
+
 function Overview() {
     const history = useHistory();
 
@@ -14,15 +18,25 @@ function Overview() {
 
     return (
         <>
-            <h1>Expenses Overview Component</h1>
+            <header className="header">
+                <div className="header__left">
+                    <Button icon="add">Add expense</Button>
+                </div>
 
-            <ul>
+                <div className="header__title">
+                    <h1>Expenses</h1>
+                </div>
+
+                <div className="header__right">filters</div>
+            </header>
+
+            <div className="list">
                 {
                     items && items.map(item => (
-                        <li key={item} onClick={() => expenseClick(item)}>{item}</li>
+                        <div className="list__item" key={item} onClick={() => expenseClick(item)}>{item}</div>
                     ))
                 }
-            </ul>
+            </div>
         </>
     );
 
