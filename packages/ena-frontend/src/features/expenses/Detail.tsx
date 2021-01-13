@@ -2,15 +2,15 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 interface DetailParams {
-	id: string;
+    id: string;
 };
 
 function Detail() {
-	const { id } = useParams<DetailParams>();
+    const { id } = useParams<DetailParams>();
 
-	return (
-		<h1>Expenses Detail {id} Component</h1>
-	);
+    return (
+        <h1>Expenses Detail {id} Component</h1>
+    );
 
 }
 

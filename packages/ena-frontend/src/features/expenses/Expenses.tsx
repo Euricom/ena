@@ -7,16 +7,16 @@ import Detail from './Detail';
 function Expenses() {
     const { path } = useRouteMatch();
 
-	return (
-		<Switch>
-			<Route exact path={`${path}/`}>
-				<Overview />
-			</Route>
-			<Route exact path={`${path}/:id`}>
-				<Detail />
-			</Route>
-		</Switch>
-	);
+    return (
+        <Switch>
+            <Route exact path={`${path}/`}>
+                <Overview />
+            </Route>
+            <Route exact path={`${path}/:id`}>
+                <Detail />
+            </Route>
+        </Switch>
+    );
 
 }
 

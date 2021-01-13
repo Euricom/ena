@@ -6,19 +6,19 @@ import Expenses from './features/expenses/Expenses';
 import './App.css';
 
 function App() {
-  return (
-   	<Router>
-		<Switch>
-			<Route path="/expenses">
-				<Expenses />
-			</Route>
+    return (
+        <Router>
+            <Switch>
+                <Route path="/expenses">
+                    <Expenses />
+                </Route>
 
-			<Route path="*">
-				<Redirect to="expenses" />
-			</Route>
-		</Switch>
-	</Router>
-  );
+                <Route path="*">
+                    <Redirect to="expenses" />
+                </Route>
+            </Switch>
+        </Router>
+    );
 }
 
 export default App;
