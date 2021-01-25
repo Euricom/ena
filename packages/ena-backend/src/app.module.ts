@@ -8,14 +8,37 @@ import { UsersResolver } from './users/users.resolver';
 import { ExpensesResolver } from './expenses/expenses.resolver';
 import { StatusesResolver } from './statuses/statuses.resolver';
 import { CategoriesResolver } from './categories/categories.resolve';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './users/user.model';
+import { Expense } from './expenses/expense.model';
+import { Status } from './statuses/status.model';
+import { Category } from './categories/category.model';
+// import { Role } from './roles/role.model';
+// import { StatusType } from './statuses/statusType.model';
+import { UserService } from './users/users.service';
+import { StatusService } from './statuses/status.service';
+import { ExpenseService } from './expenses/expense.service';
+import { CategoryService } from './categories/category.service';
+// import { RolesService } from './roles/roles.service';
 
 @Module({
   imports: [
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'pass123',
+      database: 'postgres',
+      entities: [User, Expense, Status, Category],
+      synchronize: true //disable voor productie
+    }),
+    TypeOrmModule.forFeature([User, Expense, Status, Category])
   ],
   controllers: [AppController],
-  providers: [AppService, UsersResolver, CategoriesResolver, ExpensesResolver, StatusesResolver],
+  providers: [AppService, UsersResolver, CategoriesResolver, ExpensesResolver, StatusesResolver, UserService, StatusService, ExpenseService, CategoryService],
 })
 export class AppModule {}

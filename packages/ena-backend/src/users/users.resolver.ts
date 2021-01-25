@@ -1,50 +1,57 @@
-import { Args, Int, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
+import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
 import { Expense } from "src/expenses/expense.model";
-import { Role } from "./role.model";
-import { User } from "./user.model";
+import { ExpenseService } from "src/expenses/expense.service";
+import { Status } from "src/statuses/status.model";
+import { StatusService } from "src/statuses/status.service";
+import { User, CreateUserInput, UpdateUserInput } from "./user.model";
+import { UserService } from "./users.service";
 
 @Resolver(of => User)
 export class UsersResolver {
   constructor(
+    private userService: UserService,
+    private expenseService: ExpenseService,
+    private statusService: StatusService
   ) {}
 
   @Query(retuns => [User], {name: 'users', nullable: 'items'})
-  async getUsers() {
-    return [
-      {
-        id: 1,
-        firstName: 'Mathias',
-        lastName: 'Samyn',
-      
-    },
-    {
-      id: 2,
-      firstName: 'Mathias',
-      lastName: 'Samyn',
-    
-  }
-    ]
+  getUsers() {
+    return this.userService.findAll()
   }
 
   @Query(returns => User, {name: 'user'})
-  async getUser(@Args('id', { type: () => Int }) id: number) {
-    return {
-        id: id,
-        firstName: 'Mathias',
-        lastName: 'Samyn',
-      
-    };
+  async getUser(@Args('id', { type: () => Int }) id: string) {
+    const user = this.userService.findOne(id);
+    return user;
   }
 
-  @ResolveField('expenses', returns => [Expense])
+  @ResolveField('expenses', returns => [Expense], {nullable: 'items'})
   async getExpenses(@Parent() user: User) {
-    const { id } = user;
-    return {id}
+    return this.expenseService.findByIds(user.expenses as unknown as string[])
   }
 
-  @ResolveField('roles', returns => [Role])
-  async getRoles(@Parent() user: User) {
-    const { id } = user;
-    return {id}
+  @ResolveField('statuses', returns => [Status], {nullable: 'items'})
+  async getStatuses(@Parent() user: User) {
+    return this.statusService.findByIds(user.statuses as  unknown as string[])
+  }
+
+  @Mutation(returns => User)
+  async createUser(@Args('data') user: CreateUserInput) {
+    return this.userService.create(user)
+  }
+
+  @Mutation(returns => User)
+  async updateUser(@Args('data') user: UpdateUserInput) {
+    return this.userService.update(user)
+  }
+
+  @Mutation(returns => User, {nullable: true})
+  deleteUser(@Args('id', { type: () => Int }) id: string) {
+    return this.userService.delete(id)
+  }
+  
+  @Mutation(returns => User, {nullable: true})
+  restoreUser(@Args('id', { type: () => Int }) id: string) {
+    return this.userService.restore(id)
   }
 }
