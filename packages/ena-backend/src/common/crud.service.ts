@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { Crud, UpdateCrudInput } from './crud.model';
 
 @Injectable()
-// TODO: kan type beter gedaan worden?
+// TODO: kan doorgeven van types beter gedaan worden?
 export class CrudService<T extends Crud, C, U extends UpdateCrudInput> {
   constructor(
     private repository: Repository<T>,

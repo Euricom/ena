@@ -6,7 +6,6 @@ import {
   ObjectType,
   PartialType,
 } from '@nestjs/graphql';
-import { Crud } from 'src/common/crud.model';
 import { Expense } from 'src/expenses/expense.model';
 import { Status } from 'src/statuses/status.model';
 import {

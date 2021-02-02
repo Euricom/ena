@@ -1,5 +1,4 @@
 import { Field, ID, InputType, ObjectType, PartialType } from '@nestjs/graphql';
-import { Crud } from 'src/common/crud.model';
 import { Expense } from 'src/expenses/expense.model';
 import { User } from 'src/users/user.model';
 import {
