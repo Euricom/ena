@@ -1,13 +1,13 @@
-import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
 import { Expense } from "src/expenses/expense.model";
 import { ExpenseService } from "src/expenses/expense.service";
 import { User } from "src/users/user.model";
 import { UserService } from "src/users/users.service";
-import { Status, StatusInput } from "./status.model";
+import { StatusType } from "./status.enum";
+import { Status, CreateStatusInput, UpdateStatusInput } from "./status.model";
 import { StatusService } from "./status.service";
-// import { StatusType } from "./statusType.model";
 
-@Resolver(of => Status)
+@Resolver(() => Status)
 export class StatusesResolver {
   constructor(
     private statusService: StatusService,
@@ -15,28 +15,41 @@ export class StatusesResolver {
     private expenseService: ExpenseService
   ) {}
 
-  @Query(retuns => [Status], {name: 'statuses', nullable: 'items'})
+  @Query(() => [Status], {name: 'statuses', nullable: 'items'})
   async getStatuses() {
     return this.statusService.findAll()
   }
 
-  @Query(returns => Status, {name: 'status'})
-  async getStatus(@Args('id', { type: () => Int }) id: string) {
+  @Query(() => Status, {name: 'status'})
+  async getStatus(@Args('id', { type: () => ID }) id: string) {
     return this.statusService.findOne(id)
   }
 
-  @ResolveField('user', returns => User) 
+  @Query(() => [Status], {name: 'statusesByType', nullable: 'items'})
+  async getStatusesByType(
+    @Args('type', { type: () => StatusType }) type: StatusType,
+    @Args('onlyIfLatest', { type: () =>  Boolean, defaultValue: false}) onlyIfLatest?: boolean
+  ) {
+    return this.statusService.findByType(type, onlyIfLatest)
+  }
+
+  @ResolveField('user', () => User) 
   async getUser(@Parent() status: Status) {
     return this.userService.findOne(status.user as unknown as string)
   }
 
-  @ResolveField('expense', returns => Expense) 
+  @ResolveField('expense', () => Expense) 
   async getExpense(@Parent() status: Status) {
     return this.expenseService.findOne(status.expense as unknown as string)
   }
 
-  @Mutation(returns => Status, {name: 'status'})
-  async createStatus(@Args('data') status: StatusInput) {
+  @Mutation(() => Status)
+  async createStatus(@Args('data') status: CreateStatusInput) {
     return this.statusService.create(status)
+  }
+
+  @Mutation(() => Status)
+  async updateStatus(@Args('data') status: UpdateStatusInput) {
+    return this.statusService.update(status)
   }
 }

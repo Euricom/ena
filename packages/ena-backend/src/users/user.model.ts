@@ -7,11 +7,44 @@ import { Role } from './role.enum';
 const DEFAULT_ROLES = [Role.USER];
 const DEFAULT_ACTIVE = true;
 
+@InputType()
+export class CreateUserInput {
+    @Field()
+    firstName: string;
+
+    @Field()
+    lastName: string;
+
+    @Field()
+    email: string;
+
+    @Field()
+    bankAccountNumber: string;
+
+    @Field(() => Int)
+    costCenter: number;
+
+    @Field(() => Int)
+    vendorAccount: number;
+
+    @Field(() => [Role], {nullable: 'itemsAndList'})
+    roles?: Role[];
+
+    @Field({nullable: true})
+    active?: boolean;
+}
+
+@InputType()
+export class UpdateUserInput extends PartialType(CreateUserInput) {
+    @Field(() => ID)
+    id: string
+}
+
 @Entity()
 @ObjectType()
 export class User { 
     @PrimaryGeneratedColumn('uuid')
-    @Field(type => ID)
+    @Field(() => ID)
     id: string;
 
     @Column()
@@ -31,23 +64,23 @@ export class User {
     bankAccountNumber: string;
 
     @Column()
-    @Field(type => Int)
+    @Field(() => Int)
     costCenter: number;
 
     @Column()
-    @Field(type => Int)
+    @Field(() => Int)
     vendorAccount: number;
 
     @Column({default: DEFAULT_ACTIVE})
     @Field()
     active: boolean;
 
-    @OneToMany(type => Expense, expense => expense.user)
-    @Field(type => [Expense], {nullable: 'items'})
+    @OneToMany(() => Expense, expense => expense.user, {cascade: ['soft-remove', 'recover']})
+    @Field(() => [Expense], {nullable: 'items'})
     expenses: Expense[];
 
-    @OneToMany(type => Status, status => status.user)
-    @Field(type => [Status], {nullable: 'items'})
+    @OneToMany(() => Status, status => status.user)
+    @Field(() => [Status], {nullable: 'items'})
     statuses: Status[]
 
     @Column({
@@ -56,42 +89,43 @@ export class User {
         array: true,
         default: DEFAULT_ROLES
     })
-    @Field(type => [Role])
+    @Field(() => [Role])
     roles: Role[]
 
     @DeleteDateColumn()
     deletedAt?: Date
+
+    constructor(createData?: CreateUserInput) {
+        if (!createData) {
+            return
+        }
+
+        this.firstName = createData.firstName;
+        this.lastName = createData.lastName;
+
+        this.email = createData.email;
+
+        this.bankAccountNumber = createData.bankAccountNumber;
+        this.costCenter = createData.costCenter;
+        this.vendorAccount = createData.vendorAccount;
+
+        this.roles = createData.roles;
+        this.active = createData.active;
+    }
+
+    update(updateData: UpdateUserInput): void {
+        this.firstName = updateData.firstName || this.firstName;
+        this.lastName = updateData.lastName || this.lastName;
+
+        this.email = updateData.email || this.email;
+
+        this.bankAccountNumber = updateData.bankAccountNumber || this.bankAccountNumber;
+        this.costCenter = updateData.costCenter || this.costCenter;
+        this.vendorAccount = updateData.vendorAccount || this.vendorAccount;
+
+        this.roles = updateData.roles || this.roles;
+        this.active = updateData.active || this.active;
+    }
 }
 
-@InputType()
-export class CreateUserInput {
-    @Field()
-    firstName: string;
 
-    @Field()
-    lastName: string;
-
-    @Field()
-    email: string;
-
-    @Field()
-    bankAccountNumber: string;
-
-    @Field(type => Int)
-    costCenter: number;
-
-    @Field(type => Int)
-    vendorAccount: number;
-
-    @Field(type => [Role], {nullable: 'itemsAndList'})
-    roles?: Role[];
-
-    @Field({nullable: true})
-    active?: boolean;
-}
-
-@InputType()
-export class UpdateUserInput extends PartialType(CreateUserInput) {
-    @Field(type => ID)
-    id: string
-}

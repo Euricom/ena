@@ -1,5 +1,4 @@
 import { GraphQLModule } from '@nestjs/graphql';
-
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,13 +12,11 @@ import { User } from './users/user.model';
 import { Expense } from './expenses/expense.model';
 import { Status } from './statuses/status.model';
 import { Category } from './categories/category.model';
-// import { Role } from './roles/role.model';
-// import { StatusType } from './statuses/statusType.model';
 import { UserService } from './users/users.service';
 import { StatusService } from './statuses/status.service';
 import { ExpenseService } from './expenses/expense.service';
 import { CategoryService } from './categories/category.service';
-// import { RolesService } from './roles/roles.service';
+import { StatusRepository } from './statuses/status.repository';
 
 @Module({
   imports: [
@@ -36,7 +33,7 @@ import { CategoryService } from './categories/category.service';
       entities: [User, Expense, Status, Category],
       synchronize: true //disable voor productie
     }),
-    TypeOrmModule.forFeature([User, Expense, Status, Category])
+    TypeOrmModule.forFeature([User, Expense, Status, Category, StatusRepository])
   ],
   controllers: [AppController],
   providers: [AppService, UsersResolver, CategoriesResolver, ExpensesResolver, StatusesResolver, UserService, StatusService, ExpenseService, CategoryService],

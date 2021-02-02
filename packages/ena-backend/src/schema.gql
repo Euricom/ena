@@ -24,7 +24,7 @@ enum Role {
 
 type Status {
   id: ID!
-  date: DateTime!
+  createdAt: DateTime!
   reason: String!
   expense: Expense!
   type: StatusType!
@@ -38,6 +38,7 @@ scalar DateTime
 
 enum StatusType {
   SUBMITTED
+  VALIDATED
   REJECTED
   APPROVED
   REIMBURSED
@@ -55,32 +56,76 @@ type Expense {
   id: ID!
   date: DateTime!
   amount: Float!
+  currency: Currency!
+  exchangeRate: Float!
   reason: String!
   statuses: [Status]!
+  latestStatus: Status!
   category: Category!
   user: User!
 }
 
+enum Currency {
+  AFN
+  EUR
+  ALL
+  DZD
+  USD
+  AOA
+  XCD
+  ARS
+  AMD
+  AWG
+  AUD
+  AZN
+  BSD
+  BHD
+  BDT
+  BBD
+  BYN
+  BZD
+  XOF
+  BMD
+  INR
+  BTN
+  BOB
+  BOV
+  BAM
+  BWP
+  NOK
+  BRL
+  BND
+  BGN
+  BIF
+  CVE
+  KHR
+}
+
 type Query {
   users: [User]!
-  user(id: Int!): User!
+  user(id: ID!): User!
   categories: [Category]!
-  category(id: Int!): Category!
+  category(id: ID!): Category!
   expenses: [Expense]!
-  expense(id: Int!): Expense!
+  expense(id: ID!): Expense!
   statuses: [Status]!
-  status(id: Int!): Status!
+  status(id: ID!): Status!
+  statusesByType(onlyIfLatest: Boolean = false, type: StatusType!): [Status]!
 }
 
 type Mutation {
   createUser(data: CreateUserInput!): User!
   updateUser(data: UpdateUserInput!): User!
-  deleteUser(id: Int!): User
-  restoreUser(id: Int!): User
+  deleteUser(id: ID!): ID!
+  restoreUser(id: ID!): User!
   createCategory(data: CreateCategoryInput!): Category!
   updateCategory(data: UpdateCategoryInput!): Category!
-  createExpense(data: ExpenseInput!): Expense!
-  status(data: StatusInput!): Status!
+  deleteCategory(id: ID!): ID!
+  restoreCategory(id: ID!): Category!
+  createExpense(data: CreateExpenseInput!): Expense!
+  updateExpense(data: UpdateExpenseInput!): Expense!
+  createStatus(data: CreateStatusInput!): Status!
+  updateStatus(data: UpdateStatusInput!): Status!
 }
 
 input CreateUserInput {
@@ -119,17 +164,38 @@ input UpdateCategoryInput {
   id: ID!
 }
 
-input ExpenseInput {
+input CreateExpenseInput {
   date: DateTime!
   amount: Float!
-  reason: String = ""
+  currency: Currency
+  exchangeRate: Float
+  reason: String
   categoryId: ID!
   userId: ID!
 }
 
-input StatusInput {
-  reason: String = ""
+input UpdateExpenseInput {
+  date: DateTime
+  amount: Float
+  currency: Currency
+  exchangeRate: Float
+  reason: String
+  categoryId: ID
+  userId: ID
+  id: ID!
+}
+
+input CreateStatusInput {
+  reason: String
   expenseId: ID!
-  type: StatusType = SUBMITTED
+  type: StatusType
   userId: ID!
+}
+
+input UpdateStatusInput {
+  reason: String
+  expenseId: ID
+  type: StatusType
+  userId: ID
+  id: ID!
 }

@@ -1,41 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-// import { Role } from './role.enum';
+import { CrudService } from 'src/common/crud.service';
+import { EntityManager, Repository } from 'typeorm';
 import { StatusType } from './status.enum';
-import { Status, StatusInput } from './status.model';
-// import { createUserArgs, User } from './user.model';
+import { Status, CreateStatusInput, UpdateStatusInput } from './status.model';
+import { StatusRepository } from './status.repository';
 
 @Injectable()
-export class StatusService {
+export class StatusService extends CrudService<Status, CreateStatusInput, UpdateStatusInput> {
     constructor(
-        @InjectRepository(Status)
-        private statusesRepository: Repository<Status>,
-    ) {}
-    
-    findAll(): Promise<Status[]> {
-        return this.statusesRepository.find({loadRelationIds: true});
-    }
-    
-    findOne(id: string): Promise<Status> {
-        return this.statusesRepository.findOne(id, {loadRelationIds: true});
+        private statusRepository: StatusRepository,
+    ) {
+        super(statusRepository)
     }
 
-    findByIds(ids: string[]): Promise<Status[]> {
-        return this.statusesRepository.findByIds(ids, {loadRelationIds: true});
+    findLatestFrom(ids: string[]): Promise<Status> {
+        return this.statusRepository.findLatestByIds(ids)
     }
 
-    create(status: StatusInput): Promise<Status> {
-        return this.statusesRepository.save(
-            {
-                ...status, 
-                user: {
-                    id: status.userId
-                },
-                expense: {
-                    id: status.expenseId
-                }
-            }
-        );
+    findByType(type: StatusType, onlyIfLatest: boolean): Promise<Status[]> {
+        return this.statusRepository.findByType(type, onlyIfLatest)
+    }
+
+    create(createData: CreateStatusInput, repository: Repository<Status> = this.statusRepository): Promise<Status> {
+        const status = new Status(createData);
+        return repository.save(status)
+    }
+
+    async update(updateData: UpdateStatusInput): Promise<Status> {
+        const status = await this.statusRepository.findOneOrFail(updateData.id, {loadRelationIds: true});
+        status.update(updateData)
+        return this.statusRepository.save(status);
     }
 }
