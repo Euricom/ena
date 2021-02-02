@@ -17,6 +17,8 @@ import { StatusService } from './statuses/status.service';
 import { ExpenseService } from './expenses/expense.service';
 import { CategoryService } from './categories/category.service';
 import { StatusRepository } from './statuses/status.repository';
+import { TransactionalRepositoryProvider } from './unit-of-work/transactional-repository.provider';
+import { UnitOfWorkProvider } from './unit-of-work/unit-of-work.provider';
 
 @Module({
   imports: [
@@ -31,11 +33,29 @@ import { StatusRepository } from './statuses/status.repository';
       password: 'pass123',
       database: 'postgres',
       entities: [User, Expense, Status, Category],
-      synchronize: true //disable voor productie
+      synchronize: true, //disable voor productie
     }),
-    TypeOrmModule.forFeature([User, Expense, Status, Category, StatusRepository])
+    TypeOrmModule.forFeature([
+      User,
+      Expense,
+      Status,
+      Category,
+      StatusRepository,
+    ]),
   ],
   controllers: [AppController],
-  providers: [AppService, UsersResolver, CategoriesResolver, ExpensesResolver, StatusesResolver, UserService, StatusService, ExpenseService, CategoryService],
+  providers: [
+    AppService,
+    UsersResolver,
+    CategoriesResolver,
+    ExpensesResolver,
+    StatusesResolver,
+    UserService,
+    StatusService,
+    ExpenseService,
+    CategoryService,
+    TransactionalRepositoryProvider,
+    UnitOfWorkProvider,
+  ],
 })
 export class AppModule {}

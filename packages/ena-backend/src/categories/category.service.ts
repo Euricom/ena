@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CrudService } from 'src/common/crud.service';
+import { TransactionalRepositoryProvider } from 'src/unit-of-work/transactional-repository.provider';
 import { Repository } from 'typeorm';
 import {
   Category,
@@ -14,10 +14,13 @@ export class CategoryService extends CrudService<
   CreateCategoryInput,
   UpdateCategoryInput
 > {
+  get categoryRepository(): Repository<Category> {
+    return this.transactionalRepository.getRepository(Category);
+  }
+
   constructor(
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
+    private transactionalRepository: TransactionalRepositoryProvider,
   ) {
-    super(categoryRepository, Category);
+    super(transactionalRepository.getRepository(Category), Category);
   }
 }

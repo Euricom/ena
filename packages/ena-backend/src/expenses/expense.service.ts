@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CrudService } from 'src/common/crud.service';
 import { StatusService } from 'src/statuses/status.service';
+import { TransactionalRepositoryProvider } from 'src/unit-of-work/transactional-repository.provider';
 import { Repository } from 'typeorm';
 import {
   CreateExpenseInput,
@@ -15,12 +15,15 @@ export class ExpenseService extends CrudService<
   CreateExpenseInput,
   UpdateExpenseInput
 > {
+  get expenseRepository(): Repository<Expense> {
+    return this.transactionalRepository.getRepository(Expense);
+  }
+
   constructor(
-    @InjectRepository(Expense)
-    private expenseRepository: Repository<Expense>,
+    private transactionalRepository: TransactionalRepositoryProvider,
     private statusService: StatusService,
   ) {
-    super(expenseRepository, Expense);
+    super(transactionalRepository.getRepository(Expense), Expense);
   }
 
   async create(createData: CreateExpenseInput): Promise<Expense> {

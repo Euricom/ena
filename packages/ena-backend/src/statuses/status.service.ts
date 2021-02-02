@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CrudService } from 'src/common/crud.service';
+import { TransactionalRepositoryProvider } from 'src/unit-of-work/transactional-repository.provider';
 import { StatusType } from './status.enum';
 import { Status, CreateStatusInput, UpdateStatusInput } from './status.model';
 import { StatusRepository } from './status.repository';
@@ -10,8 +11,17 @@ export class StatusService extends CrudService<
   CreateStatusInput,
   UpdateStatusInput
 > {
-  constructor(private statusRepository: StatusRepository) {
-    super(statusRepository, Status);
+  get statusRepository(): StatusRepository {
+    return this.transactionalRepository.getCustomRepository(StatusRepository);
+  }
+
+  constructor(
+    private transactionalRepository: TransactionalRepositoryProvider,
+  ) {
+    super(
+      transactionalRepository.getCustomRepository(StatusRepository),
+      Status,
+    );
   }
 
   findLatestFrom(ids: string[]): Promise<Status> {

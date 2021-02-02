@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CrudService } from 'src/common/crud.service';
+import { TransactionalRepositoryProvider } from 'src/unit-of-work/transactional-repository.provider';
 import { Repository } from 'typeorm';
 import { User, CreateUserInput, UpdateUserInput } from './user.model';
-import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService extends CrudService<
@@ -11,7 +10,13 @@ export class UserService extends CrudService<
   CreateUserInput,
   UpdateUserInput
 > {
-  constructor(private userRepository: UserRepository) {
-    super(userRepository, User);
+  get userRepository(): Repository<User> {
+    return this.transactionalRepository.getRepository(User);
+  }
+
+  constructor(
+    private transactionalRepository: TransactionalRepositoryProvider,
+  ) {
+    super(transactionalRepository.getRepository(User), User);
   }
 }
