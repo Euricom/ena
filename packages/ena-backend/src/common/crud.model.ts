@@ -1,7 +1,7 @@
 export interface UpdateCrudInput {
-    id: string;
+  id: string;
 }
 
 export interface Crud {
-    update(updateData: UpdateCrudInput): void
+  update(updateData: UpdateCrudInput): void;
 }

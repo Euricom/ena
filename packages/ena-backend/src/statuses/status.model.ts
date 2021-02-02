@@ -1,94 +1,102 @@
-import { Field, ID, InputType, ObjectType, PartialType } from "@nestjs/graphql";
-import { Expense } from "src/expenses/expense.model";
-import { User } from "src/users/user.model";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { StatusType } from './status.enum'
+import { Field, ID, InputType, ObjectType, PartialType } from '@nestjs/graphql';
+import { Crud } from 'src/common/crud.model';
+import { Expense } from 'src/expenses/expense.model';
+import { User } from 'src/users/user.model';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { StatusType } from './status.enum';
 
 const DEFAULT_STATUS_TYPE = StatusType.SUBMITTED;
 const DEFAULT_REASON = '';
 
 @InputType()
 export class CreateStatusInput {
-    @Field({nullable: true})
-    reason?: string;
+  @Field({ nullable: true })
+  reason?: string;
 
-    @Field(() => ID)
-    expenseId: string;
-    
-    @Field(() => StatusType, {nullable: true})
-    type?: StatusType
-    
-    @Field(() => ID)
-    userId: string;
+  @Field(() => ID)
+  expenseId: string;
+
+  @Field(() => StatusType, { nullable: true })
+  type?: StatusType;
+
+  @Field(() => ID)
+  userId: string;
 }
 
 @InputType()
 export class UpdateStatusInput extends PartialType(CreateStatusInput) {
-    @Field(() => ID)
-    id: string;
+  @Field(() => ID)
+  id: string;
 }
 
 @Entity()
 @ObjectType()
 export class Status {
-    @PrimaryGeneratedColumn('uuid')
-    @Field(() => ID)
-    id: string;
-    
-    @CreateDateColumn()
-    @Field()
-    createdAt: Date;
+  @PrimaryGeneratedColumn('uuid')
+  @Field(() => ID)
+  id: string;
 
-    @Column({default: DEFAULT_REASON})
-    @Field()
-    reason: string;
+  @CreateDateColumn()
+  @Field()
+  createdAt: Date;
 
-    @ManyToOne(() => Expense, expense => expense.statuses)
-    @Field(() => Expense)
-    expense: Expense;
+  @Column({ default: DEFAULT_REASON })
+  @Field()
+  reason: string;
 
-    @Column({
-        type: "enum",
-        enum: StatusType,
-        default: DEFAULT_STATUS_TYPE
-    })
-    @Field(() => StatusType)
-    type: StatusType
-    
-    @ManyToOne(() => User, user => user.statuses)
-    @Field(() => User)
-    user: User;
+  @ManyToOne(() => Expense, (expense) => expense.statuses)
+  @Field(() => Expense)
+  expense: Expense;
 
-    @DeleteDateColumn()
-    deletedAt?: Date
+  @Column({
+    type: 'enum',
+    enum: StatusType,
+    default: DEFAULT_STATUS_TYPE,
+  })
+  @Field(() => StatusType)
+  type: StatusType;
 
-    constructor(status?: CreateStatusInput) {
-        if (!status) {
-            return;
-        }
+  @ManyToOne(() => User, (user) => user.statuses)
+  @Field(() => User)
+  user: User;
 
-        this.reason = status.reason;
-        this.type = status.type;
+  @DeleteDateColumn()
+  deletedAt?: Date;
 
-        this.user = new User();
-        this.user.id = status.userId;
-
-        this.expense = new Expense();
-        this.expense.id = status.expenseId;
+  constructor(status?: CreateStatusInput) {
+    if (!status) {
+      return;
     }
 
-    update(status: UpdateStatusInput): void {
-        this.reason = status.reason || this.reason;
-        this.type = status.type || this.type;
+    this.reason = status.reason;
+    this.type = status.type;
 
-        if (status.userId) {
-            this.user = new User();
-            this.user.id = status.userId;
-        }
-       
-        if (status.expenseId) {
-            this.expense = new Expense();
-            this.expense.id = status.expenseId;
-        }
+    this.user = new User();
+    this.user.id = status.userId;
+
+    this.expense = new Expense();
+    this.expense.id = status.expenseId;
+  }
+
+  update(status: UpdateStatusInput): void {
+    this.reason = status.reason || this.reason;
+    this.type = status.type || this.type;
+
+    if (status.userId) {
+      this.user = new User();
+      this.user.id = status.userId;
     }
+
+    if (status.expenseId) {
+      this.expense = new Expense();
+      this.expense.id = status.expenseId;
+    }
+  }
 }
