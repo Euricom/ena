@@ -1,10 +1,8 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { PassportStrategy, AuthGuard } from '@nestjs/passport';
 import { BearerStrategy } from 'passport-azure-ad';
-
-const clientID = 'TEST';
-const tenantID = 'TEST';
 
 /**
  * Extracts ID token from header and validates it.
@@ -14,15 +12,16 @@ export class AzureADStrategy extends PassportStrategy(
   BearerStrategy,
   'azure-ad',
 ) {
-  constructor() {
+  constructor(configService: ConfigService) {
     super({
-      identityMetadata: `https://login.microsoftonline.com/${tenantID}/v2.0/.well-known/openid-configuration`,
-      clientID,
+      identityMetadata: `https://login.microsoftonline.com/${configService.get<string>(
+        'NEST_API_AD_TENANT',
+      )}/v2.0/.well-known/openid-configuration`,
+      clientID: configService.get<string>('NEST_API_AD_CLIENT'),
     });
   }
 
   async validate(data) {
-    console.log(data);
     return data;
   }
 }
