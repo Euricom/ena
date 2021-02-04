@@ -33,6 +33,13 @@ export class CategoriesResolver {
     return this.categoryService.findOne(id);
   }
 
+  @Query(() => [Category], { nullable: 'items' })
+  getCategoriesByFilter(
+    @Args('filter', { type: () => String }) filter: string,
+  ) {
+    return this.categoryService.findWithFilter(filter);
+  }
+
   @ResolveField('expenses', () => [Expense], { nullable: 'items' })
   async getExpenses(@Parent() category: Category) {
     return this.expenseService.findByIds(

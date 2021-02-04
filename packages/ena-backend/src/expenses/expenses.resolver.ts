@@ -40,11 +40,16 @@ export class ExpensesResolver {
     return this.expenseService.findOne(id);
   }
 
-  @Query(() => [Expense])
+  @Query(() => [Expense], { nullable: 'items' })
   async getExpensesByStatusType(
     @Args('statusType', { type: () => StatusType }) type: StatusType,
   ) {
     return this.expenseService.findByStatusType(type);
+  }
+
+  @Query(() => [Expense], { nullable: 'items' })
+  getExpensesByFilter(@Args('filter', { type: () => String }) filter: string) {
+    return this.expenseService.findWithFilter(filter);
   }
 
   @ResolveField('user', () => User)

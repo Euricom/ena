@@ -27,6 +27,11 @@ export class UsersResolver {
     return this.userService.findAll();
   }
 
+  @Query(() => [User], { nullable: 'items' })
+  getUsersByFilter(@Args('filter', { type: () => String }) filter: string) {
+    return this.userService.findWithFilter(filter);
+  }
+
   @Query(() => User, { name: 'user' })
   async getUser(@Args('id', { type: () => ID }) id: string) {
     return this.userService.findOne(id);

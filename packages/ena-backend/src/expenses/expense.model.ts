@@ -117,6 +117,7 @@ export class Expense {
     this.amount = createData.amount;
     this.reason = createData.reason;
     this.currency = createData.currency;
+    this.exchangeRate = createData.exchangeRate;
   }
 
   update(updateData: UpdateExpenseInput): void {

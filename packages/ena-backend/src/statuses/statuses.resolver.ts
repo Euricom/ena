@@ -42,6 +42,11 @@ export class StatusesResolver {
     return this.statusService.findByType(type, onlyIfLatest);
   }
 
+  @Query(() => [Status], { nullable: 'items' })
+  getStatusesByFilter(@Args('filter', { type: () => String }) filter: string) {
+    return this.statusService.findWithFilter(filter);
+  }
+
   @ResolveField('user', () => User)
   async getUser(@Parent() status: Status) {
     return this.userService.findOne((status.user as unknown) as string);

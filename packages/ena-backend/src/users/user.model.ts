@@ -68,7 +68,7 @@ export class User {
   @Field()
   lastName: string;
 
-  @Column()
+  @Column({ unique: true })
   @Field()
   email: string;
 

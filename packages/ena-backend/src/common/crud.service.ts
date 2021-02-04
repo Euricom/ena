@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Crud, UpdateCrudInput } from './crud.interface';
 
 @Injectable()
@@ -20,6 +20,22 @@ export class CrudService<T extends Crud, C, U extends UpdateCrudInput> {
 
   findByIds(ids: string[]): Promise<T[]> {
     return this.repository.findByIds(ids, { loadRelationIds: true });
+  }
+
+  findWithFilter(filter: string): Promise<T[]> {
+    const entity = new this.type({});
+    const filterArray = [];
+    Object.getOwnPropertyNames(entity).forEach((prop) => {
+      const filterObject = {
+        [prop]: Raw(
+          (alias) =>
+            `LOWER(CAST(${alias} AS TEXT)) LIKE '%${filter.toLowerCase()}%'`,
+        ),
+      };
+      filterArray.push(filterObject);
+    });
+
+    return this.repository.find({ where: filterArray, loadRelationIds: true });
   }
 
   create(createData: C): Promise<T> {
