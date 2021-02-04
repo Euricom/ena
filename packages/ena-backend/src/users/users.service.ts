@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CrudService } from 'src/common/crud.service';
-import { TransactionalRepositoryProvider } from 'src/unit-of-work/transactional-repository.provider';
+import { TransactionalRepositoryProvider } from 'src/common/transactional-repository.provider';
 import { Repository } from 'typeorm';
 import { User, CreateUserInput, UpdateUserInput } from './user.model';
 

@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CrudService } from 'src/common/crud.service';
-import { StatusService } from 'src/statuses/status.service';
-import { TransactionalRepositoryProvider } from 'src/unit-of-work/transactional-repository.provider';
-import { Repository } from 'typeorm';
+import { TransactionalRepositoryProvider } from 'src/common/transactional-repository.provider';
 import {
   CreateExpenseInput,
   Expense,
   UpdateExpenseInput,
 } from './expense.model';
+import { StatusType } from 'src/statuses/status.enum';
+import { ExpenseRepository } from './expense.repository';
+import { Status } from 'src/statuses/status.model';
 
 @Injectable()
 export class ExpenseService extends CrudService<
@@ -15,26 +16,28 @@ export class ExpenseService extends CrudService<
   CreateExpenseInput,
   UpdateExpenseInput
 > {
-  get expenseRepository(): Repository<Expense> {
-    return this.transactionalRepository.getRepository(Expense);
+  get expenseRepository(): ExpenseRepository {
+    return this.transactionalRepository.getCustomRepository(ExpenseRepository);
   }
 
   constructor(
     private transactionalRepository: TransactionalRepositoryProvider,
-    private statusService: StatusService,
   ) {
-    super(transactionalRepository.getRepository(Expense), Expense);
+    super(
+      transactionalRepository.getCustomRepository(ExpenseRepository),
+      Expense,
+    );
   }
 
-  async create(createData: CreateExpenseInput): Promise<Expense> {
+  create(createData: CreateExpenseInput): Promise<Expense> {
     const expense = new Expense(createData);
-    const savedExpense = await this.expenseRepository.save(expense);
+    const status = new Status();
+    status.user = expense.user;
+    expense.statuses = [status];
+    return this.expenseRepository.save(expense);
+  }
 
-    await this.statusService.create({
-      userId: savedExpense.user.id,
-      expenseId: savedExpense.id,
-    });
-
-    return this.findOne(savedExpense.id);
+  async findByStatusType(statusType: StatusType): Promise<Expense[]> {
+    return await this.expenseRepository.findByStatusType(statusType);
   }
 }

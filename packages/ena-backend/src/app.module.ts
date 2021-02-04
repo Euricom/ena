@@ -17,8 +17,8 @@ import { StatusService } from './statuses/status.service';
 import { ExpenseService } from './expenses/expense.service';
 import { CategoryService } from './categories/category.service';
 import { StatusRepository } from './statuses/status.repository';
-import { TransactionalRepositoryProvider } from './unit-of-work/transactional-repository.provider';
-import { UnitOfWorkProvider } from './unit-of-work/unit-of-work.provider';
+import { TransactionalRepositoryProvider } from './common/transactional-repository.provider';
+import { UnitOfWorkProvider } from './common/unit-of-work.provider';
 
 @Module({
   imports: [

@@ -84,7 +84,7 @@ export class Expense {
   @Field()
   reason: string;
 
-  @OneToMany(() => Status, (status) => status.expense)
+  @OneToMany(() => Status, (status) => status.expense, { cascade: ['insert'] })
   @Field(() => [Status])
   statuses: Status[];
 

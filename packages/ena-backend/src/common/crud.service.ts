@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Crud, UpdateCrudInput } from './crud.model';
+import { Crud, UpdateCrudInput } from './crud.interface';
 
 @Injectable()
 // TODO: kan doorgeven van types beter gedaan worden?
