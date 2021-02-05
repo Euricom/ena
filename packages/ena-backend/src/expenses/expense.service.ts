@@ -4,11 +4,13 @@ import { TransactionalRepositoryProvider } from 'src/common/transactional-reposi
 import {
   CreateExpenseInput,
   Expense,
+  ExpensesPaginated,
   UpdateExpenseInput,
 } from './expense.model';
 import { StatusType } from 'src/statuses/status.enum';
 import { ExpenseRepository } from './expense.repository';
 import { Status } from 'src/statuses/status.model';
+import { PaginationInput } from 'src/common/pagination.model';
 
 @Injectable()
 export class ExpenseService extends CrudService<
@@ -29,15 +31,25 @@ export class ExpenseService extends CrudService<
     );
   }
 
-  create(createData: CreateExpenseInput): Promise<Expense> {
+  async create(createData: CreateExpenseInput): Promise<Expense> {
     const expense = new Expense(createData);
     const status = new Status();
     status.user = expense.user;
     expense.statuses = [status];
-    return this.expenseRepository.save(expense);
+    return await this.expenseRepository.save(expense);
   }
 
   async findByStatusType(statusType: StatusType): Promise<Expense[]> {
     return await this.expenseRepository.findByStatusType(statusType);
+  }
+
+  async findByStatusTypePaginated(
+    statusType: StatusType,
+    paginationData: PaginationInput,
+  ): Promise<ExpensesPaginated> {
+    return this.expenseRepository.findByStatusTypeAndCount(statusType, {
+      skip: paginationData.skip,
+      take: paginationData.take,
+    });
   }
 }

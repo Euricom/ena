@@ -6,6 +6,7 @@ import {
   ObjectType,
   PartialType,
 } from '@nestjs/graphql';
+import { PaginationResultClass } from 'src/common/pagination.model';
 import { Expense } from 'src/expenses/expense.model';
 import {
   Column,
@@ -82,3 +83,6 @@ export class Category {
     this.active = updateData.active || this.active;
   }
 }
+
+@ObjectType()
+export class CategoriesPaginated extends PaginationResultClass(Category) {}

@@ -1,4 +1,5 @@
 import { Field, ID, InputType, ObjectType, PartialType } from '@nestjs/graphql';
+import { PaginationResultClass } from 'src/common/pagination.model';
 import { Expense } from 'src/expenses/expense.model';
 import { User } from 'src/users/user.model';
 import {
@@ -99,3 +100,6 @@ export class Status {
     }
   }
 }
+
+@ObjectType()
+export class StatusesPaginated extends PaginationResultClass(Status) {}

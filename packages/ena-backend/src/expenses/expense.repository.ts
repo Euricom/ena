@@ -1,12 +1,33 @@
+import { setCustomQueryOptions } from 'src/common/custom-query-options';
+import { ICustomQueryOptions } from 'src/common/custom-query-options';
 import { StatusType } from 'src/statuses/status.enum';
 import { Status } from 'src/statuses/status.model';
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository, Repository, SelectQueryBuilder } from 'typeorm';
 import { Expense } from './expense.model';
 
 @EntityRepository(Expense)
 export class ExpenseRepository extends Repository<Expense> {
-  findByStatusType(statusType: StatusType): Promise<Expense[]> {
-    return this.createQueryBuilder('expense')
+  async findByStatusType(
+    statusType: StatusType,
+    queryOptions?: ICustomQueryOptions,
+  ): Promise<Expense[]> {
+    const query = this.createFindByStatusTypeQuery(statusType, queryOptions);
+    return await query.getMany();
+  }
+
+  async findByStatusTypeAndCount(
+    statusType: StatusType,
+    queryOptions?: ICustomQueryOptions,
+  ): Promise<[Expense[], number]> {
+    const query = this.createFindByStatusTypeQuery(statusType, queryOptions);
+    return await query.getManyAndCount();
+  }
+
+  private createFindByStatusTypeQuery(
+    statusType: StatusType,
+    queryOptions?: ICustomQueryOptions,
+  ): SelectQueryBuilder<Expense> {
+    const query = this.createQueryBuilder('expense')
       .setParameter('statusType', statusType)
       .innerJoin(
         (qb) => {
@@ -31,7 +52,8 @@ export class ExpenseRepository extends Repository<Expense> {
         'latestStatuses',
         '"latestStatuses"."expenseId" = expense.id AND "latestStatuses"."type" = :statusType',
       )
-      .loadAllRelationIds()
-      .getMany();
+      .loadAllRelationIds();
+
+    return setCustomQueryOptions(query, queryOptions);
   }
 }

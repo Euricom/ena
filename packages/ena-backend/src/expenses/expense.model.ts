@@ -18,6 +18,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Currency } from './currency.enum';
+import { PaginationResultClass } from 'src/common/pagination.model';
 
 const DEFAULT_REASON = '';
 const DEFAULT_CURRENCY = Currency.EUR;
@@ -137,3 +138,6 @@ export class Expense {
     this.currency = updateData.currency || this.currency;
   }
 }
+
+@ObjectType()
+export class ExpensesPaginated extends PaginationResultClass(Expense) {}

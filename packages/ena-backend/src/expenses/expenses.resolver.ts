@@ -16,10 +16,12 @@ import { UserService } from 'src/users/users.service';
 import {
   CreateExpenseInput,
   Expense,
+  ExpensesPaginated,
   UpdateExpenseInput,
 } from './expense.model';
 import { ExpenseService } from './expense.service';
 import { StatusType } from 'src/statuses/status.enum';
+import { PaginationInput } from 'src/common/pagination.model';
 
 @Resolver(() => Expense)
 export class ExpensesResolver {
@@ -30,61 +32,148 @@ export class ExpensesResolver {
     private statusService: StatusService,
   ) {}
 
-  @Query(() => [Expense], { name: 'expenses', nullable: 'items' })
-  async getExpenses() {
-    return this.expenseService.findAll();
+  //#region queries
+
+  @Query(() => [Expense], { nullable: 'items' })
+  async getExpenses(): Promise<Expense[]> {
+    return await this.expenseService.findAll();
   }
 
-  @Query(() => Expense, { name: 'expense' })
-  async getExpense(@Args('id', { type: () => ID }) id: string) {
-    return this.expenseService.findOne(id);
+  @Query(() => ExpensesPaginated)
+  async getExpensesPaginated(
+    @Args('pagination')
+    paginationData: PaginationInput,
+  ): Promise<ExpensesPaginated> {
+    return await this.expenseService.findAllPaginated(paginationData);
+  }
+
+  @Query(() => Expense)
+  async getExpense(
+    @Args('id', { type: () => ID })
+    id: string,
+  ): Promise<Expense> {
+    return await this.expenseService.findOne(id);
   }
 
   @Query(() => [Expense], { nullable: 'items' })
   async getExpensesByStatusType(
-    @Args('statusType', { type: () => StatusType }) type: StatusType,
-  ) {
-    return this.expenseService.findByStatusType(type);
+    @Args('statusType', { type: () => StatusType })
+    type: StatusType,
+  ): Promise<Expense[]> {
+    return await this.expenseService.findByStatusType(type);
+  }
+
+  @Query(() => ExpensesPaginated)
+  async getExpensesByStatusTypePaginated(
+    @Args('statusType', { type: () => StatusType })
+    type: StatusType,
+    @Args('pagination')
+    paginationData: PaginationInput,
+  ): Promise<ExpensesPaginated> {
+    return await this.expenseService.findByStatusTypePaginated(
+      type,
+      paginationData,
+    );
   }
 
   @Query(() => [Expense], { nullable: 'items' })
-  getExpensesByFilter(@Args('filter', { type: () => String }) filter: string) {
-    return this.expenseService.findWithFilter(filter);
+  async getExpensesByFilter(
+    @Args('filter', { type: () => String })
+    filter: string,
+  ): Promise<Expense[]> {
+    return await this.expenseService.findWithFilter(filter);
   }
 
+  @Query(() => ExpensesPaginated)
+  async getExpensesByFilterPaginated(
+    @Args('filter', { type: () => String })
+    filter: string,
+    @Args('pagination')
+    paginationData: PaginationInput,
+  ): Promise<ExpensesPaginated> {
+    return await this.expenseService.findWithFilterPaginated(
+      filter,
+      paginationData,
+    );
+  }
+
+  //#endregion
+
+  //#region field resolvers
+
   @ResolveField('user', () => User)
-  async getUser(@Parent() expense: Expense) {
-    return this.userService.findOne((expense.user as unknown) as string);
+  async getUser(
+    @Parent()
+    expense: Expense,
+  ): Promise<User> {
+    return await this.userService.findOne((expense.user as unknown) as string);
   }
 
   @ResolveField('category', () => Category)
-  async getCategory(@Parent() expense: Expense) {
-    return this.categoryService.findOne(
+  async getCategory(
+    @Parent()
+    expense: Expense,
+  ): Promise<Category> {
+    return await this.categoryService.findOne(
       (expense.category as unknown) as string,
     );
   }
 
   @ResolveField('latestStatus', () => Status)
-  async getLatestStatus(@Parent() expense: Expense) {
-    return this.statusService.findLatestFrom(
+  async getLatestStatus(
+    @Parent()
+    expense: Expense,
+  ): Promise<Status> {
+    return await this.statusService.findLatestFrom(
       (expense.statuses as unknown) as string[],
     );
   }
 
   @ResolveField('statuses', () => [Status], { nullable: 'items' })
-  async getStatuses(@Parent() expense: Expense) {
-    return this.statusService.findByIds(
+  async getStatuses(
+    @Parent()
+    expense: Expense,
+  ): Promise<Status[]> {
+    return await this.statusService.findByIds(
       (expense.statuses as unknown) as string[],
     );
   }
 
+  //#endregion
+
+  //#region mutations
+
   @Mutation(() => Expense)
-  async createExpense(@Args('data') expense: CreateExpenseInput) {
-    return this.expenseService.create(expense);
+  async createExpense(
+    @Args('data')
+    expense: CreateExpenseInput,
+  ): Promise<Expense> {
+    return await this.expenseService.create(expense);
   }
 
   @Mutation(() => Expense)
-  async updateExpense(@Args('data') expense: UpdateExpenseInput) {
-    return this.expenseService.update(expense);
+  async updateExpense(
+    @Args('data')
+    expense: UpdateExpenseInput,
+  ): Promise<Expense> {
+    return await this.expenseService.update(expense);
   }
+
+  @Mutation(() => Expense)
+  async deleteExpense(
+    @Args('id', { type: () => ID })
+    id: string,
+  ): Promise<string> {
+    return await this.expenseService.delete(id);
+  }
+
+  @Mutation(() => Expense)
+  async restoreExpense(
+    @Args('id', { type: () => ID })
+    id: string,
+  ): Promise<Expense> {
+    return await this.expenseService.restore(id);
+  }
+
+  //#endregion
 }
