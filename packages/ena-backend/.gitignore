@@ -35,3 +35,6 @@ lerna-debug.log*
 
 # Graphql schema
 schema.gql
+
+# environment configuration variables
+.env

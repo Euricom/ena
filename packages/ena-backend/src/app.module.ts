@@ -1,7 +1,5 @@
 import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { join } from 'path';
 import { UsersResolver } from './users/users.resolver';
 import { ExpensesResolver } from './expenses/expenses.resolver';
@@ -19,21 +17,25 @@ import { CategoryService } from './categories/category.service';
 import { StatusRepository } from './statuses/status.repository';
 import { TransactionalRepositoryProvider } from './common/transactional-repository.provider';
 import { UnitOfWorkProvider } from './common/unit-of-work.provider';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'pass123',
-      database: 'postgres',
-      entities: [User, Expense, Status, Category],
-      synchronize: true, //disable voor productie
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'postgres',
+        host: process.env.DB_HOST,
+        port: +process.env.DB_PORT,
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        entities: [User, Expense, Status, Category],
+        synchronize: process.env.ENV === 'development',
+      }),
     }),
     TypeOrmModule.forFeature([
       User,
@@ -43,9 +45,7 @@ import { UnitOfWorkProvider } from './common/unit-of-work.provider';
       StatusRepository,
     ]),
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     UsersResolver,
     CategoriesResolver,
     ExpensesResolver,
