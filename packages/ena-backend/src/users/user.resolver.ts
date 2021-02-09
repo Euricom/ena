@@ -19,10 +19,10 @@ import {
   UpdateUserInput,
   UsersPaginated,
 } from './user.model';
-import { UserService } from './users.service';
+import { UserService } from './user.service';
 
 @Resolver(() => User)
-export class UsersResolver {
+export class UserResolver {
   constructor(
     private userService: UserService,
     private expenseService: ExpenseService,

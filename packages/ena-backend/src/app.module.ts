@@ -1,16 +1,11 @@
 import { GraphQLModule } from '@nestjs/graphql';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
-import { UsersResolver } from './users/users.resolver';
-import { ExpensesResolver } from './expenses/expenses.resolver';
-import { StatusesResolver } from './statuses/statuses.resolver';
-import { CategoriesResolver } from './categories/categories.resolve';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/user.model';
 import { Expense } from './expenses/expense.model';
 import { Status } from './statuses/status.model';
 import { Category } from './categories/category.model';
-import { UserService } from './users/users.service';
 import { StatusService } from './statuses/status.service';
 import { ExpenseService } from './expenses/expense.service';
 import { CategoryService } from './categories/category.service';
@@ -18,6 +13,11 @@ import { StatusRepository } from './statuses/status.repository';
 import { TransactionalRepositoryProvider } from './common/transactional-repository.provider';
 import { UnitOfWorkProvider } from './common/unit-of-work.provider';
 import { ConfigModule } from '@nestjs/config';
+import { CategoryResolver } from './categories/category.resolver';
+import { ExpenseResolver } from './expenses/expense.resolver';
+import { UserResolver } from './users/user.resolver';
+import { UserService } from './users/user.service';
+import { StatusResolver } from './statuses/status.resolver';
 
 @Module({
   imports: [
@@ -46,10 +46,10 @@ import { ConfigModule } from '@nestjs/config';
     ]),
   ],
   providers: [
-    UsersResolver,
-    CategoriesResolver,
-    ExpensesResolver,
-    StatusesResolver,
+    UserResolver,
+    CategoryResolver,
+    ExpenseResolver,
+    StatusResolver,
     UserService,
     StatusService,
     ExpenseService,

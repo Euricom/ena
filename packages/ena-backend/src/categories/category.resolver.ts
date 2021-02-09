@@ -19,7 +19,7 @@ import {
 import { CategoryService } from './category.service';
 
 @Resolver(() => Category)
-export class CategoriesResolver {
+export class CategoryResolver {
   constructor(
     private categoryService: CategoryService,
     private expenseService: ExpenseService,

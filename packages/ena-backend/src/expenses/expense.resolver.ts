@@ -12,7 +12,7 @@ import { CategoryService } from 'src/categories/category.service';
 import { Status } from 'src/statuses/status.model';
 import { StatusService } from 'src/statuses/status.service';
 import { User } from 'src/users/user.model';
-import { UserService } from 'src/users/users.service';
+import { UserService } from 'src/users/user.service';
 import {
   CreateExpenseInput,
   Expense,
@@ -24,7 +24,7 @@ import { StatusType } from 'src/statuses/status.enum';
 import { PaginationInput } from 'src/common/pagination.model';
 
 @Resolver(() => Expense)
-export class ExpensesResolver {
+export class ExpenseResolver {
   constructor(
     private expenseService: ExpenseService,
     private userService: UserService,
